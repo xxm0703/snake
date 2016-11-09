@@ -1,11 +1,13 @@
 import pygame
-import random, os
+import random
+import os
+
 pygame.init()
 
 wide = 800
 high = 600
-snake_x = wide/2  # To be at the center of the screen
-snake_y = high/2
+snake_x = wide / 2  # To be at the center of the screen
+snake_y = high / 2
 apple_x = random.randint(10, wide - 10)  # Some space before border
 apple_y = random.randint(10, high - 10)
 print(apple_x, apple_y)
@@ -17,13 +19,26 @@ WHITE = [255, 255, 255]
 BLACK = [0, 0, 0]
 YELLOW = [255, 255, 0]
 D_BLUE = [52, 63, 197]
+D_GREEN = [0, 128, 0]
 
 slither = pygame.image.load('photo.png')
+
 
 def message(msg, color=BLACK, size=25, line=1):
     font = pygame.font.SysFont(None, size, True)
     text = font.render(msg, True, color)
-    screen.blit(text, [wide/2 - len(msg)*6, high/3 + line * 25])
+    screen.blit(text, [wide / 2 - len(msg) * 6, high / 3 + line * 25])
+
+
+def eyes(direction, x, y):
+    if direction is "UP":
+        return [[x + 2, y + 2], [x + 6, y + 2]]
+    elif direction is "LEFT":
+        return [[x + 2, y + 6], [x + 2, y + 2]]
+    elif direction is "DOWN":
+        return [[x + 6, y + 6], [x + 2, y + 6]]
+    elif direction is "RIGHT":
+        return [[x + 6, y + 2], [x + 6, y + 6]]
 
 screen = pygame.display.set_mode((wide, high))
 pygame.display.set_caption("Snake!")
@@ -101,8 +116,13 @@ while PLAY:
 
         pygame.draw.rect(screen, RED, [apple_x, apple_y, 9, 9])
         for cord in pos_list:
-            pygame.draw.rect(screen, GREEN, [cord[0], cord[1], 10, 10])
-            print(cord[0], cord[1])
+            if cord is not pos_list[0]:
+                pygame.draw.rect(screen, D_GREEN, [cord[0], cord[1], 10, 10])
+            else:
+                pygame.draw.rect(screen, GREEN, [cord[0], cord[1], 10, 10])
+                for eye_cord in eyes(state, cord[0], cord[1]):
+                    pygame.draw.rect(screen, BLACK, [eye_cord[0], eye_cord[1], 2, 2])
+                    print(eye_cord)
         pygame.draw.rect(screen, BLACK, [0, 0, 800, 600], 2)
         pygame.display.update()
         clock.tick(10)
