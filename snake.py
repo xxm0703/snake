@@ -9,8 +9,7 @@ high = 600
 snake_x = wide / 2  # To be at the center of the screen
 snake_y = high / 2
 apple_x = random.randint(10, wide - 10)  # Some space before border
-apple_y = random.randint(10, high - 10)
-print(apple_x, apple_y)
+apple_y = random.randint(20, high - 10)
 
 RED = [255, 0, 0]
 GREEN = [0, 255, 0]
@@ -20,14 +19,15 @@ BLACK = [0, 0, 0]
 YELLOW = [255, 255, 0]
 D_BLUE = [52, 63, 197]
 D_GREEN = [0, 128, 0]
+T_BLACK = [0, 0, 0, 50]
 
 slither = pygame.image.load('photo.png')
 
 
-def message(msg, color=BLACK, size=25, line=1):
+def message(msg, color=BLACK, size=25, line=1, msg_x=wide/2, msg_y=high/3):
     font = pygame.font.SysFont(None, size, True)
     text = font.render(msg, True, color)
-    screen.blit(text, [wide / 2 - len(msg) * 6, high / 3 + line * 25])
+    screen.blit(text, [msg_x - len(msg) * 6, msg_y + line * 25])
 
 
 def eyes(direction, x, y):
@@ -44,6 +44,7 @@ screen = pygame.display.set_mode((wide, high))
 pygame.display.set_caption("Snake!")
 clock = pygame.time.Clock()
 
+PAUSE = False
 PLAY = True
 in_game = False
 change_x = 0
@@ -73,7 +74,11 @@ while PLAY:
                 PLAY = False
                 in_game = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and state != "RIGHT":
+                if event.key == pygame.K_p:
+                    message('PAUSED', BLACK, 35, 2)
+                    pygame.display.update()
+                    PAUSE = True
+                elif event.key == pygame.K_LEFT and state != "RIGHT":
                     change_x = -10
                     change_y = 0
                     state = "LEFT"
@@ -89,6 +94,15 @@ while PLAY:
                     change_y = 10
                     change_x = 0
                     state = "DOWN"
+        while PAUSE:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        PAUSE = False
+                if event.type == pygame.QUIT:
+                    PLAY = False
+                    in_game = False
+                    PAUSE = False
 
         snake_x += change_x
         snake_y += change_y
@@ -103,7 +117,7 @@ while PLAY:
 
         elif -10 < apple_x - snake_x < 10 and -10 < apple_y - snake_y < 10:
             apple_x = random.randint(10, wide - 10)
-            apple_y = random.randint(10, high - 10)
+            apple_y = random.randint(20, high - 10)
             pos_list.append((snake_x - change_x, snake_y - change_y))
             apple_count += 1
             if apple_count == 10:
@@ -114,6 +128,7 @@ while PLAY:
 
         screen.fill(D_BLUE)
 
+        message("P for pause", T_BLACK, 15, 1, 70, -20)
         pygame.draw.rect(screen, RED, [apple_x, apple_y, 9, 9])
         for cord in pos_list:
             if cord is not pos_list[0]:
@@ -122,10 +137,10 @@ while PLAY:
                 pygame.draw.rect(screen, GREEN, [cord[0], cord[1], 10, 10])
                 for eye_cord in eyes(state, cord[0], cord[1]):
                     pygame.draw.rect(screen, BLACK, [eye_cord[0], eye_cord[1], 2, 2])
-                    print(eye_cord)
         pygame.draw.rect(screen, BLACK, [0, 0, 800, 600], 2)
         pygame.display.update()
         clock.tick(10)
+    screen.fill(WHITE)
 
 pygame.quit()
 quit()
