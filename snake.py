@@ -1,6 +1,5 @@
 import pygame
 import random
-import os
 
 pygame.init()
 
@@ -10,6 +9,8 @@ snake_x = wide / 2  # To be at the center of the screen
 snake_y = high / 2
 apple_x = random.randint(10, wide - 10)  # Some space before border
 apple_y = random.randint(20, high - 10)
+wall_x = 0
+wall_y = 0
 
 RED = [255, 0, 0]
 GREEN = [0, 255, 0]
@@ -43,7 +44,7 @@ def eyes(direction, x, y):
 screen = pygame.display.set_mode((wide, high))
 pygame.display.set_caption("Snake!")
 clock = pygame.time.Clock()
-
+apple_sound = pygame.mixer.music.load('sound.mp3')
 PAUSE = False
 PLAY = True
 in_game = False
@@ -53,6 +54,7 @@ state = "UP"
 screen.fill(WHITE)
 while PLAY:
     pos_list = []
+    wall_list = []
     pos_list.insert(0, (snake_x, snake_y))
     apple_count = 0
     screen.blit(slither, [100, 0])
@@ -109,15 +111,19 @@ while PLAY:
         pos_list.insert(0, (snake_x, snake_y))
         pos_list.pop(-1)
 
-        if snake_x < 0 or snake_y < 0 or snake_x > wide or snake_y > high or pos_list.count(pos_list[0]) == 2:
+        if snake_x < 0 or snake_y < 0 or snake_x > wide or snake_y > high or (-10 < wall_x - snake_x < 10 and -10 < wall_y - snake_y < 10) or pos_list.count(pos_list[0]) == 2:
             message("Game Over!", RED, 35)
             pygame.display.update()
             pygame.time.delay(2000)
             in_game = False
 
         elif -10 < apple_x - snake_x < 10 and -10 < apple_y - snake_y < 10:
+            pygame.mixer.music.play()
             apple_x = random.randint(10, wide - 10)
             apple_y = random.randint(20, high - 10)
+            wall_x = random.randint(10, wide - 10)
+            wall_y = random.randint(20, high - 10)
+            wall_list.append((wall_x, wall_y))
             pos_list.append((snake_x - change_x, snake_y - change_y))
             apple_count += 1
             if apple_count == 10:
@@ -130,6 +136,11 @@ while PLAY:
 
         message("P for pause", T_BLACK, 15, 1, 70, -20)
         pygame.draw.rect(screen, RED, [apple_x, apple_y, 9, 9])
+        for (wall_x, wall_y) in wall_list:
+            if wall_x % 2 == 0:
+                pygame.draw.line(screen, YELLOW, (wall_x, wall_y), (wall_x + 40, wall_y), 10)
+            else:
+                pygame.draw.line(screen, YELLOW, (wall_x, wall_y), (wall_x, wall_y + 40), 10)
         for cord in pos_list:
             if cord is not pos_list[0]:
                 pygame.draw.rect(screen, D_GREEN, [cord[0], cord[1], 10, 10])
