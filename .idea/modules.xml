@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/snake.iml" filepath="$PROJECT_DIR$/.idea/snake.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tetris/.idea/matrix.iml" filepath="$PROJECT_DIR$/../tetris/.idea/matrix.iml" />
     </modules>
   </component>
 </project>
