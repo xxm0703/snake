@@ -25,7 +25,7 @@ T_BLACK = [0, 0, 0, 50]
 slither = pygame.image.load('photo.png')
 
 
-def message(msg, color=BLACK, size=25, line=1, msg_x=wide/2, msg_y=high/3):
+def message(msg, color=BLACK, size=25, line=1, msg_x=wide / 2, msg_y=high / 3):
     font = pygame.font.SysFont(None, size, True)
     text = font.render(msg, True, color)
     screen.blit(text, [msg_x - len(msg) * 6, msg_y + line * 25])
@@ -40,6 +40,16 @@ def eyes(direction, x, y):
         return [[x + 6, y + 6], [x + 2, y + 6]]
     elif direction is "RIGHT":
         return [[x + 6, y + 2], [x + 6, y + 6]]
+
+
+def bump_into_wall(head, walls):
+    for x, y in walls:
+        if x % 2:  # horizontal
+            if abs(x + 20 - head[0]) < 20 and abs(head[1] - y) < 5:
+                return True
+        elif abs(y + 20 - head[1]) < 20 and abs(head[0] - x) < 5:
+            return True
+
 
 screen = pygame.display.set_mode((wide, high))
 pygame.display.set_caption("Snake!")
@@ -111,7 +121,9 @@ while PLAY:
         pos_list.insert(0, (snake_x, snake_y))
         pos_list.pop(-1)
 
-        if snake_x < 0 or snake_y < 0 or snake_x > wide or snake_y > high or (-10 < wall_x - snake_x < 10 and -10 < wall_y - snake_y < 10) or pos_list.count(pos_list[0]) == 2:
+        if snake_x < 0 or snake_y < 0 or snake_x > wide or snake_y > high or bump_into_wall(pos_list[0],
+                                                                                            wall_list) or pos_list.count(
+            pos_list[0]) == 2:
             message("Game Over!", RED, 35)
             pygame.display.update()
             pygame.time.delay(2000)
@@ -137,7 +149,7 @@ while PLAY:
         message("P for pause", T_BLACK, 15, 1, 70, -20)
         pygame.draw.rect(screen, RED, [apple_x, apple_y, 9, 9])
         for (wall_x, wall_y) in wall_list:
-            if wall_x % 2 == 0:
+            if wall_x % 2:
                 pygame.draw.line(screen, YELLOW, (wall_x, wall_y), (wall_x + 40, wall_y), 10)
             else:
                 pygame.draw.line(screen, YELLOW, (wall_x, wall_y), (wall_x, wall_y + 40), 10)
